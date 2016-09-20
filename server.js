@@ -1,21 +1,27 @@
-var express = require('express');
-var path = require('path');
-var logger = require('morgan');
-var compression = require('compression');
-var methodOverride = require('method-override');
-var session = require('express-session');
-var flash = require('express-flash');
-var bodyParser = require('body-parser');
-var expressValidator = require('express-validator');
-var dotenv = require('dotenv');
-var mongoose = require('mongoose');
-var passport = require('passport');
+var express           = require('express');
+var path              = require('path');
+var logger            = require('morgan');
+var compression       = require('compression');
+var methodOverride    = require('method-override');
+var session           = require('express-session');
+var flash             = require('express-flash');
+var bodyParser        = require('body-parser');
+var expressValidator  = require('express-validator');
+var dotenv            = require('dotenv');
+var mongoose          = require('mongoose');
+var passport          = require('passport');
+var multer = require('multer');
+var upload = multer({ dest: './public/uploads/' });
 
 // Load environment variables from .env file
 dotenv.load();
 
-var user = require('./api/user');
-var auth = require('./api/auth');
+var user              = require('./api/user');
+var auth              = require('./api/auth');
+var catalogue         = require('./api/catalogue');
+var comment           = require('./api/comment');
+var hashtag            = require('./api/hashtag');
+var image             = require('./api/image');
 
 // Passport OAuth strategies
 require('./config/passport');
@@ -47,8 +53,12 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/api/user',user);
-app.use('/api/auth',auth);
+app.use('/api/user'       ,user);
+app.use('/api/auth'       ,auth);
+app.use('/api/hastag'     ,hashtag);
+app.use('/api/image'      ,image);
+app.use('/api/comment'    ,comment);
+app.use('/api/catalogue'  ,catalogue);
 
 // Production error handler
 if (app.get('env') === 'production') {

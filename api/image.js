@@ -7,30 +7,34 @@ var express = require('express');
 var router = express.Router();
 
 router.post('/saveImage',function (req,res) {
-    var link;
-    var image = new Image({
-        caption:req.body.caption,
-        source:link,
-        updatedAt:Date.now(),
-        catalogue:req.body.catalogueId,
-        user:req.user.id,
-        hashtags:req.body.hashtags.split(',')
-    });
-    image.save(function (err) {
-        if(err){
-            return res.status(500).send({
-                status:500,
-                exception:'internal server error',
-                message:'internal server error'
-            });
-        }else{
-            return res.status(200).send({
-                status:200,
-                exception:'image saved successfully',
-                message:'Image Saved Successfully'
-            });
-        }
-    })
+    console.log("o missa general");
+    console.log(req.files);
+    console.log(req.body);
+    res.send(200);
+    // var link;
+    // var image = new Image({
+    //     caption:req.body.caption,
+    //     source:link,
+    //     updatedAt:Date.now(),
+    //     catalogue:req.body.catalogueId,
+    //     user:req.user.id,
+    //     hashtags:req.body.hashtags.split(',')
+    // });
+    // image.save(function (err) {
+    //     if(err){
+    //         return res.status(500).send({
+    //             status:500,
+    //             exception:'internal server error',
+    //             message:'internal server error'
+    //         });
+    //     }else{
+    //         return res.status(200).send({
+    //             status:200,
+    //             exception:'image saved successfully',
+    //             message:'Image Saved Successfully'
+    //         });
+    //     }
+    // })
 });
 
 router.get('/getImage',function (req,res) {

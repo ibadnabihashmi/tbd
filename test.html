@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+<form id="testform">
+    <input name="name" type="text"/>
+    <input name="occupation" type="text"/>
+    <input name="displayImage" type="file"/>
+    <button type="submit">submit</button>
+</form>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#testform').submit(function (e) {
+            e.preventDefault();
+            var formData = new FormData($(this)[0]);
+            $.ajax({
+                url: 'http://localhost:3000/api/image/saveImage',
+                type: 'POST',
+                data: formData,
+                async: false,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (returndata) {
+                    alert(returndata);
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>
