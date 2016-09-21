@@ -1,0 +1,26 @@
+doctype html
+html(lang='en')
+    head
+        meta(charset='UTF-8')
+        title Title
+    body
+        form#testform(action='/api/image/saveImage',method='POST',enctype='multipart/form-data')
+            input(name='name', type='text')
+            input(name='occupation', type='text')
+            input(name='displayImage', type='file')
+            button(type='submit') submit
+        //script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js')
+        //script.
+        //    $(document).ready(function () {
+        //        $('#testform').submit(function (e) {
+        //            e.preventDefault();
+        //            var formData = new FormData($(this)[0]);
+        //            $.post('http://localhost:3000/api/image/saveImage', {
+        //                name: $('[name="name"]').val(),
+        //                occ: $('[name="occupation"]').val(),
+        //                dp: $('[name="displayImage"]').val()
+        //            },function (res) {
+        //                alert(res);
+        //            });
+        //        });
+        //    });

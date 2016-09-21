@@ -10,8 +10,6 @@ var expressValidator  = require('express-validator');
 var dotenv            = require('dotenv');
 var mongoose          = require('mongoose');
 var passport          = require('passport');
-var multer = require('multer');
-var upload = multer({ dest: './public/uploads/' });
 
 // Load environment variables from .env file
 dotenv.load();
@@ -20,7 +18,7 @@ var user              = require('./api/user');
 var auth              = require('./api/auth');
 var catalogue         = require('./api/catalogue');
 var comment           = require('./api/comment');
-var hashtag            = require('./api/hashtag');
+var hashtag           = require('./api/hashtag');
 var image             = require('./api/image');
 
 // Passport OAuth strategies
@@ -53,6 +51,9 @@ app.use(function(req, res, next) {
 });
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/test',function (req,res) {
+  res.render('test');
+});
 app.use('/api/user'       ,user);
 app.use('/api/auth'       ,auth);
 app.use('/api/hastag'     ,hashtag);

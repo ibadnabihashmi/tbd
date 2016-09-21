@@ -21,7 +21,11 @@
             $.ajax({
                 url: 'http://localhost:3000/api/image/saveImage',
                 type: 'POST',
-                data: formData,
+                data: {
+                    name:$('[name="name"]').val(),
+                    occ:$('[name="occupation"]').val(),
+                    displayImage:$('[name="displayImage"]').val()
+                },
                 async: false,
                 cache: false,
                 contentType: false,

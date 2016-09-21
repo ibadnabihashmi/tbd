@@ -1,14 +1,16 @@
-var async = require('async');
-var nodemailer = require('nodemailer');
-var passport = require('passport');
-var Image = require('../models/Image');
-var Comment = require('../models/Comment');
-var express = require('express');
-var router = express.Router();
+var async       = require('async');
+var nodemailer  = require('nodemailer');
+var passport    = require('passport');
+var Image       = require('../models/Image');
+var Comment     = require('../models/Comment');
+var express     = require('express');
+var router      = express.Router();
+var multer      = require('multer');
 
-router.post('/saveImage',function (req,res) {
+router.post('/saveImage',multer({ dest: '../uploads/' }).single('displayImage'),function (req,res, next) {
+
     console.log("o missa general");
-    console.log(req.files);
+    console.log(req.file);
     console.log(req.body);
     res.send(200);
     // var link;
