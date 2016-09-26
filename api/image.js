@@ -5,38 +5,37 @@ var Image       = require('../models/Image');
 var Comment     = require('../models/Comment');
 var express     = require('express');
 var router      = express.Router();
+var fs          = require('fs');
 var multer      = require('multer');
+var upload      = multer({ dest: './public/uploads/' });
 
-router.post('/saveImage',multer({ dest: '../uploads/' }).single('displayImage'),function (req,res, next) {
-
-    console.log("o missa general");
-    console.log(req.file);
-    console.log(req.body);
-    res.send(200);
-    // var link;
-    // var image = new Image({
-    //     caption:req.body.caption,
-    //     source:link,
-    //     updatedAt:Date.now(),
-    //     catalogue:req.body.catalogueId,
-    //     user:req.user.id,
-    //     hashtags:req.body.hashtags.split(',')
-    // });
-    // image.save(function (err) {
-    //     if(err){
-    //         return res.status(500).send({
-    //             status:500,
-    //             exception:'internal server error',
-    //             message:'internal server error'
-    //         });
-    //     }else{
-    //         return res.status(200).send({
-    //             status:200,
-    //             exception:'image saved successfully',
-    //             message:'Image Saved Successfully'
-    //         });
-    //     }
-    // })
+router.post('/saveImage',upload.single('displayImage'),function (req,res, next) {
+    fs.mkdirSync('./public/uploads/'+req.user.id);
+    fs.renameSync('./public/uploads/'+req.file.filename,'./public/uploads/'+'someuser/'+req.file.filename+'_'+req.file.originalname);
+    var link = 'public/uploads/'+'someuser/'+req.file.filename+'_'+req.file.originalname;
+    var image = new Image({
+        caption:req.body.caption,
+        source:link,
+        updatedAt:Date.now(),
+        catalogue:req.body.catalogueId,
+        user:req.user.id,
+        hashtags:req.body.hashtags.split(',')
+    });
+    image.save(function (err) {
+        if(err){
+            return res.status(500).send({
+                status:500,
+                exception:'internal server error',
+                message:'internal server error'
+            });
+        }else{
+            return res.status(200).send({
+                status:200,
+                exception:'image saved successfully',
+                message:'Image Saved Successfully'
+            });
+        }
+    })
 });
 
 router.get('/getImage',function (req,res) {
