@@ -1,10 +1,22 @@
-var async = require('async');
-var crypto = require('crypto');
-var nodemailer = require('nodemailer');
-var passport = require('passport');
-var User = require('../models/User');
-var express = require('express');
-var router = express.Router();
+var async       = require('async');
+var crypto      = require('crypto');
+var nodemailer  = require('nodemailer');
+var passport    = require('passport');
+var User        = require('../models/User');
+var express     = require('express');
+var router      = express.Router();
+var moment      = require('moment');
+var jwt         = require('jsonwebtoken');
+
+function generateToken(user) {
+    var payload = {
+        iss: 'my.domain.com',
+        sub: user.id,
+        iat: moment().unix(),
+        exp: moment().add(7, 'days').unix()
+    };
+    return jwt.sign(payload, process.env.TOKEN_SECRET);
+}
 
 router.post('/login',function(req,res,next){
     passport.authenticate('local', function(err, user, info) {
@@ -47,6 +59,8 @@ router.post('/signup',function(req, res, next){
             }
             req.logIn(user, function(err) {
                 return res.status(201).send({
+                    token: generateToken(user),
+                    user:user,
                     status:201,
                     exception:null,
                     message:'New user created'

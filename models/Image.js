@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
-var User = require('../models/User');
-var Catalogue = require('../models/Catalogue');
+var mongoose    = require('mongoose');
+var User        = require('../models/User');
+var Catalogue   = require('../models/Catalogue');
 
 var imageSchema = new mongoose.Schema({
     caption:{

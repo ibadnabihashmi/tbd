@@ -1,9 +1,9 @@
-var async = require('async');
-var nodemailer = require('nodemailer');
-var passport = require('passport');
-var Hashtag = require('../models/Hashtag');
-var express = require('express');
-var router = express.Router();
+var async       = require('async');
+var nodemailer  = require('nodemailer');
+var passport    = require('passport');
+var Hashtag     = require('../models/Hashtag');
+var express     = require('express');
+var router      = express.Router();
 
 router.post('/',function (req,res) {
     async.each(req.body.hashtags.split(','),function(hashtag,callback){

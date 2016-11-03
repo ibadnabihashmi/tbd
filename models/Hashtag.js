@@ -1,5 +1,5 @@
-var mongoose = require('mongoose');
-var Image = require('../models/Image');
+var mongoose    = require('mongoose');
+var Image       = require('../models/Image');
 
 var hashtagSchema = new mongoose.Schema({
     name : {

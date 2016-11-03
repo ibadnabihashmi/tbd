@@ -1,12 +1,12 @@
-var async = require('async');
-var nodemailer = require('nodemailer');
-var passport = require('passport');
-var User = require('../models/User');
-var Catalogue = require('../models/Catalogue');
-var Image = require('../models/Image');
-var Comment = require('../models/Comment');
-var express = require('express');
-var router = express.Router();
+var async       = require('async');
+var nodemailer  = require('nodemailer');
+var passport    = require('passport');
+var User        = require('../models/User');
+var Catalogue   = require('../models/Catalogue');
+var Image       = require('../models/Image');
+var Comment     = require('../models/Comment');
+var express     = require('express');
+var router      = express.Router();
 
 router.post('/create',function(req,res){
     var catalogue = new Catalogue({

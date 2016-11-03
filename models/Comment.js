@@ -1,5 +1,5 @@
-var mongoose = require('mongoose');
-var User = require('../models/User');
+var mongoose    = require('mongoose');
+var User        = require('../models/User');
 
 var commentSchema = new mongoose.Schema({
     text:{
