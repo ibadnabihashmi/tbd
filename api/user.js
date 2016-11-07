@@ -17,6 +17,22 @@ function generateToken(user) {
     };
     return jwt.sign(payload, process.env.TOKEN_SECRET);
 }
+router.get('/checkAuth',function (req,res) {
+    console.log("******************************");
+    console.log("here we are once again");
+    console.log(req.user);
+    if(req.user){
+        return res.status(200).send({
+            token: generateToken(req.user),
+            user:req.user,
+            status:200,
+            exception:null,
+            message:'user exists'
+        });
+    }else{
+        res.send(404);
+    }
+});
 
 router.post('/login',function(req,res,next){
     passport.authenticate('local', function(err, user, info) {
