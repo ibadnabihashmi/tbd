@@ -10,6 +10,7 @@ var expressValidator  = require('express-validator');
 var dotenv            = require('dotenv');
 var mongoose          = require('mongoose');
 var passport          = require('passport');
+var cors              = require('cors');
 
 // Load environment variables from .env file
 dotenv.load();
@@ -25,21 +26,6 @@ var image             = require('./api/image');
 require('./config/passport');
 
 var app = express();
-var allowCrossDomain = function(req, res, next) {
-  res.header('Access-Control-Allow-Credentials', true);
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-
-  // intercept OPTIONS method
-  if ('OPTIONS' == req.method) {
-    res.send(200);
-  }
-  else {
-    next();
-  }
-};
-
 mongoose.connect(process.env.MONGODB);
 mongoose.connection.on('error', function() {
   console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
@@ -48,7 +34,7 @@ mongoose.connection.on('error', function() {
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 app.set('port', process.env.PORT || 3000);
-app.use(allowCrossDomain);
+app.use(cors());
 app.use(compression());
 app.use(logger('dev'));
 app.use(bodyParser.json());
