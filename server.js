@@ -11,6 +11,8 @@ var dotenv            = require('dotenv');
 var mongoose          = require('mongoose');
 var passport          = require('passport');
 var cors              = require('cors');
+var MongoStore        = require('connect-mongo')(session);
+var cookieParser      = require('cookie-parser');
 
 // Load environment variables from .env file
 dotenv.load();
@@ -41,14 +43,20 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(expressValidator());
 app.use(methodOverride('_method'));
-app.use(session({ secret: process.env.SESSION_SECRET, resave: true, saveUninitialized: true }));
-app.use(flash());
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  store: new MongoStore({
+    url: process.env.MONGODB
+  }),
+  resave: true,
+  saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(function(req, res, next) {
   res.locals.user = req.user;
   next();
 });
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/test',function (req,res) {

@@ -18,9 +18,6 @@ function generateToken(user) {
     return jwt.sign(payload, process.env.TOKEN_SECRET);
 }
 router.get('/checkAuth',function (req,res) {
-    console.log("******************************");
-    console.log("here we are once again");
-    console.log(req.user);
     if(req.user){
         return res.status(200).send({
             token: generateToken(req.user),
