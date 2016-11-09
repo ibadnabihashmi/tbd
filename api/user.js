@@ -18,17 +18,25 @@ function generateToken(user) {
     return jwt.sign(payload, process.env.TOKEN_SECRET);
 }
 router.get('/checkAuth',function (req,res) {
-    if(req.user){
-        return res.status(200).send({
-            token: generateToken(req.user),
-            user:req.user,
-            status:200,
-            exception:null,
-            message:'user exists'
+    User
+        .findById(req.query.id)
+        .select('-password')
+        .exec(function (err,user) {
+            if(err || !user){
+                console.log(err);
+                res.status(500).send({
+                    status:500,
+                    message:'Internal server error'
+                });
+            }else{
+                return res.status(200).send({
+                    user:user,
+                    status:200,
+                    exception:null,
+                    message:'user found'
+                });
+            }
         });
-    }else{
-        res.send(404);
-    }
 });
 
 router.post('/login',function(req,res,next){
@@ -39,11 +47,12 @@ router.post('/login',function(req,res,next){
                 message:"user not found"
             });
         }
-        req.logIn(user, function(err) {
-            return res.status(200).send({
-                status:200,
-                message:"logged in"
-            });
+        return res.status(201).send({
+            token: generateToken(user),
+            user:user,
+            status:201,
+            exception:null,
+            message:'New user created'
         });
     })(req, res, next);
 });
@@ -70,14 +79,12 @@ router.post('/signup',function(req, res, next){
                     message:'Internal server error'
                 });
             }
-            req.logIn(user, function(err) {
-                return res.status(201).send({
-                    token: generateToken(user),
-                    user:user,
-                    status:201,
-                    exception:null,
-                    message:'New user created'
-                });
+            return res.status(201).send({
+                token: generateToken(user),
+                user:user,
+                status:201,
+                exception:null,
+                message:'New user created'
             });
         });
     });

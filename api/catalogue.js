@@ -12,7 +12,7 @@ router.post('/create',function(req,res){
     var catalogue = new Catalogue({
         name:req.body.name,
         description:req.body.description?req.body.description:undefined,
-        user:req.user.id,
+        user:req.body.id,
         updatedAt:Date.now()
     });
     catalogue.save(function(err){
