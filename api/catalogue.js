@@ -107,12 +107,38 @@ router.delete('/remove',function (req,res) {
                                 return res.status(200).send({
                                     status:200,
                                     exception:null,
-                                    message:'Catalgue and associated content deleted successfully'
+                                    message:'Catalogue and associated content deleted successfully'
                                 });
                             });
                     });
             }
         })
+});
+
+router.get('/fetchUserCatalogues',function (req,res) {
+    Catalogue
+        .find({
+            user:req.query.userId
+        })
+        .sort({
+            createdAt:-1
+        })
+        .exec(function (err,catalogues) {
+            if(err || !catalogues){
+                return res.status(404).send({
+                    status:404,
+                    exception:'nothiong found',
+                    message:'No catalogues found'
+                });
+            }else{
+                return res.status(200).send({
+                    status:200,
+                    exception:null,
+                    message:'Catalogues found',
+                    catalogues:catalogues
+                });
+            }
+        });
 });
 
 module.exports = router;
