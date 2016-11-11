@@ -7,6 +7,8 @@ var Image       = require('../models/Image');
 var Comment     = require('../models/Comment');
 var express     = require('express');
 var router      = express.Router();
+var multer      = require('multer');
+var upload      = multer({ dest: './public/uploads/' });
 
 router.post('/create',function(req,res){
     var catalogue = new Catalogue({
@@ -54,37 +56,40 @@ router.get('/get',function (req,res) {
         });
 });
 
-router.put('/update',function (req,res) {
-    Catalogue
-        .findById(req.body.catalogueId)
-        .exec(function (err,catalogue) {
-            if(catalogue){
-                catalogue.name = req.body.name;
-                catalogue.description = req.body.description;
-                catalogue.updatedAt = Date.now()
-                catalogue.save(function(err){
-                    if(err){
-                        return res.status(500).send({
-                            status:500,
-                            exception:'Internal server',
-                            message:'Cannot delete due to Internal Error '+err
-                        });
-                    }else{
-                        return res.status(200).send({
-                            status:200,
-                            exception:null,
-                            message:'updated catalogue successfully'
-                        });
-                    }
-                });
-            }else{
-                return res.status(404).send({
-                    status:404,
-                    message:'Catalogue not found',
-                    exception:'Not Found'
-                });
-            }
-        });
+router.post('/update',upload.array('files'),function (req,res) {
+    console.log(req.body);
+    console.log(req.files);
+    res.send(200);
+    // Catalogue
+    //     .findById(req.body.catalogueId)
+    //     .exec(function (err,catalogue) {
+    //         if(catalogue){
+    //             catalogue.name = req.body.name;
+    //             catalogue.description = req.body.description;
+    //             catalogue.updatedAt = Date.now()
+    //             catalogue.save(function(err){
+    //                 if(err){
+    //                     return res.status(500).send({
+    //                         status:500,
+    //                         exception:'Internal server',
+    //                         message:'Cannot delete due to Internal Error '+err
+    //                     });
+    //                 }else{
+    //                     return res.status(200).send({
+    //                         status:200,
+    //                         exception:null,
+    //                         message:'updated catalogue successfully'
+    //                     });
+    //                 }
+    //             });
+    //         }else{
+    //             return res.status(404).send({
+    //                 status:404,
+    //                 message:'Catalogue not found',
+    //                 exception:'Not Found'
+    //             });
+    //         }
+    //     });
 });
 
 router.delete('/remove',function (req,res) {
