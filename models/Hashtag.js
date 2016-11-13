@@ -1,14 +1,21 @@
-var mongoose    = require('mongoose');
-var Image       = require('../models/Image');
+var mongoose        = require('mongoose');
+var Image           = require('../models/Image');
+var Catalogue       = require('../models/Catalogue');
 
 var hashtagSchema = new mongoose.Schema({
-    name : {
-        type : String
+    name: {
+        type: String
     },
-    imagesTagged : [
+    imagesTagged: [
         {
-            type : mongoose.Schema.Types.ObjectId,
-            ref : 'Image'
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Image'
+        }
+    ],
+    cataloguesTagged: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Catalogue'
         }
     ]
 });

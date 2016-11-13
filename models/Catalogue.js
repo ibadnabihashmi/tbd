@@ -8,6 +8,10 @@ var catalogueSchema = new mongoose.Schema({
     description:{
         type:String
     },
+    price:{
+        type:Number
+    },
+    hashtags:[String],
     user:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
