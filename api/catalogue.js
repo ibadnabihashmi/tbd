@@ -43,13 +43,12 @@ router.post('/create',upload.array('files'),function(req,res){
                             fs.renameSync('./public/uploads/'+file.filename,'./public/uploads/'+user._id+'/'+catalogue.name+'/'+file.filename+'_'+file.originalname);
                             var image = new Image({
                                 caption:req.body['image'+counter+'caption'],
-                                source:'./public/uploads/'+user._id+'/'+catalogue.name+'/'+file.filename+'_'+file.originalname,
+                                source:'/uploads/'+user._id+'/'+catalogue.name+'/'+file.filename+'_'+file.originalname,
                                 updatedAt:Date.now(),
                                 catalogue:catalogue._id,
                                 user:user._id,
                                 hashtags:_.union(req.body['image'+counter+'tags'].split(' '))
                             });
-                            console.log(counter);
                             counter++;
                             image.save(function (err) {
                                 if(!err){
@@ -86,20 +85,17 @@ router.post('/create',upload.array('files'),function(req,res){
                                             });
                                     },function (err) {
                                         if(err){
-                                            console.log(err);
                                             callback1(err)
                                         }else{
                                             callback1();
                                         }
                                     });
                                 }else{
-                                    console.log(err);
                                     callback1(err)
                                 }
                             });
                         },function (err) {
                             if(err){
-                                console.log(err);
                                 return res.status(500).send({
                                     status:500,
                                     exception:err,
@@ -133,17 +129,34 @@ router.post('/create',upload.array('files'),function(req,res){
 
 });
 
+
+
 router.get('/get/:catalogueId',function (req,res) {
     Catalogue
         .findById(req.params.catalogueId)
         .exec(function (err,catalogue) {
-            if(catalogue){
-                return res.status(200).send({
-                    status:200,
-                    exception:null,
-                    message:'catalogue retreived',
-                    catalogue:catalogue
-                })
+            if(!err && catalogue){
+                Image
+                    .find({ catalogue:catalogue._id })
+                    .exec(function (err,images) {
+                        if(!err && images.length > 0){
+                            return res.status(200).send({
+                                status:200,
+                                exception:null,
+                                message:'catalogue retreived',
+                                catalogue:catalogue,
+                                images:images
+                            });
+                        }else{
+                            return res.status(200).send({
+                                status:200,
+                                exception:null,
+                                message:'catalogue retreived',
+                                catalogue:catalogue,
+                                images:[]
+                            });
+                        }
+                    });
             }else{
                 return res.status(404).send({
                     status:404,
@@ -155,39 +168,102 @@ router.get('/get/:catalogueId',function (req,res) {
 });
 
 router.post('/update',upload.array('files'),function (req,res) {
-    console.log(req.body);
-    console.log(req.files);
-    res.send(200);
-    // Catalogue
-    //     .findById(req.body.catalogueId)
-    //     .exec(function (err,catalogue) {
-    //         if(catalogue){
-    //             catalogue.name = req.body.name;
-    //             catalogue.description = req.body.description;
-    //             catalogue.updatedAt = Date.now()
-    //             catalogue.save(function(err){
-    //                 if(err){
-    //                     return res.status(500).send({
-    //                         status:500,
-    //                         exception:'Internal server',
-    //                         message:'Cannot delete due to Internal Error '+err
-    //                     });
-    //                 }else{
-    //                     return res.status(200).send({
-    //                         status:200,
-    //                         exception:null,
-    //                         message:'updated catalogue successfully'
-    //                     });
-    //                 }
-    //             });
-    //         }else{
-    //             return res.status(404).send({
-    //                 status:404,
-    //                 message:'Catalogue not found',
-    //                 exception:'Not Found'
-    //             });
-    //         }
-    //     });
+    User
+        .findById(req.body.userId)
+        .exec(function (err,user) {
+            if(user && !err){
+                Catalogue
+                    .findById(req.body.catId)
+                    .exec(function (err,catalogue) {
+                        if(catalogue){
+                            fs.renameSync('./public/uploads/'+user._id+'/'+catalogue.name,'./public/uploads/'+user._id+'/'+req.body.catName);
+                            catalogue.name = req.body.catName;
+                            catalogue.description = req.body.catDesc;
+                            catalogue.updatedAt = Date.now();
+                            catalogue.price = req.body.catPrice;
+                            Image
+                                .find({
+                                    '$and':[
+                                        {
+                                            catalogue:catalogue._id
+                                        },
+                                        {
+                                            user:user._id
+                                        }
+                                    ]
+                                })
+                                .exec(function (err,images) {
+                                    if(images.length > 0 && !err){
+                                        async.eachSeries(images,function (image ,callback) {
+                                            var srcLength = image.source.split('/').length;
+                                            image.source = '/uploads/'+user._id+'/'+req.body.catName + '/' + image.source.split('/')[srcLength-1];
+                                            image.save(function (err) {
+                                                if(!err){
+                                                    callback();
+                                                }else{
+                                                    callback(err);
+                                                }
+                                            });
+                                        },function (err) {
+                                            if(!err){
+                                                catalogue.save(function(err){
+                                                    if(err){
+                                                        return res.status(500).send({
+                                                            status:500,
+                                                            exception:'Internal server',
+                                                            message:'Cannot update catalogue due to Internal Error '+err
+                                                        });
+                                                    }else{
+                                                        return res.status(200).send({
+                                                            status:200,
+                                                            exception:null,
+                                                            message:'updated catalogue successfully'
+                                                        });
+                                                    }
+                                                });
+                                            }else{
+                                                return res.status(500).send({
+                                                    status:500,
+                                                    exception:'Internal server',
+                                                    message:'Cannot update catalogue due to Internal Error '+err
+                                                });
+                                            }
+                                        })
+                                    }else{
+                                        catalogue.save(function(err){
+                                            if(err){
+                                                return res.status(500).send({
+                                                    status:500,
+                                                    exception:'Internal server',
+                                                    message:'Cannot update catalogue due to Internal Error '+err
+                                                });
+                                            }else{
+                                                return res.status(200).send({
+                                                    status:200,
+                                                    exception:null,
+                                                    message:'updated catalogue successfully'
+                                                });
+                                            }
+                                        });
+                                    }
+                                });
+
+                        }else{
+                            return res.status(404).send({
+                                status:404,
+                                message:'Catalogue not found',
+                                exception:'Not Found'
+                            });
+                        }
+                    });
+            }else{
+                return res.status(404).send({
+                    status:404,
+                    message:'User not found',
+                    exception:'Not Found'
+                });
+            }
+        });
 });
 
 router.delete('/remove',function (req,res) {
