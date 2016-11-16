@@ -136,27 +136,31 @@ router.get('/get/:catalogueId',function (req,res) {
         .findById(req.params.catalogueId)
         .exec(function (err,catalogue) {
             if(!err && catalogue){
-                Image
-                    .find({ catalogue:catalogue._id })
-                    .exec(function (err,images) {
-                        if(!err && images.length > 0){
-                            return res.status(200).send({
-                                status:200,
-                                exception:null,
-                                message:'catalogue retreived',
-                                catalogue:catalogue,
-                                images:images
-                            });
-                        }else{
-                            return res.status(200).send({
-                                status:200,
-                                exception:null,
-                                message:'catalogue retreived',
-                                catalogue:catalogue,
-                                images:[]
-                            });
-                        }
-                    });
+                catalogue.views += 1;
+                catalogue.save(function (err) {
+                    Image
+                        .find({ catalogue:catalogue._id })
+                        .exec(function (err,images) {
+                            if(!err && images.length > 0){
+                                return res.status(200).send({
+                                    status:200,
+                                    exception:null,
+                                    message:'catalogue retreived',
+                                    catalogue:catalogue,
+                                    images:images
+                                });
+                            }else{
+                                return res.status(200).send({
+                                    status:200,
+                                    exception:null,
+                                    message:'catalogue retreived',
+                                    catalogue:catalogue,
+                                    images:[]
+                                });
+                            }
+                        });
+                });
+
             }else{
                 return res.status(404).send({
                     status:404,

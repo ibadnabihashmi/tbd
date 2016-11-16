@@ -22,6 +22,10 @@ var catalogueSchema = new mongoose.Schema({
     },
     modifiedAt:{
         type:Date
+    },
+    views: {
+        type:Number,
+        default:0
     }
 });
 
