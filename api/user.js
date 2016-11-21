@@ -3,10 +3,14 @@ var crypto      = require('crypto');
 var nodemailer  = require('nodemailer');
 var passport    = require('passport');
 var User        = require('../models/User');
+var Image       = require('../models/Image');
 var express     = require('express');
 var router      = express.Router();
 var moment      = require('moment');
 var jwt         = require('jsonwebtoken');
+var multer      = require('multer');
+var upload      = multer({ dest: './public/uploads/' });
+var fs          = require('fs');
 
 function generateToken(user) {
     var payload = {
@@ -99,8 +103,9 @@ router.get('/logout',function(req,res){
     });
 });
 
-router.put('/update',function(req,res,next){
-    User.findById(req.user.id, function(err, user) {
+router.post('/update',function(req,res,next){
+    console.log(req.body);
+    User.findById(req.body.id, function(err, user) {
         if ('password' in req.body) {
             user.password = req.body.password;
         } else {
@@ -125,6 +130,43 @@ router.put('/update',function(req,res,next){
             });
         });
     });
+});
+
+router.post('/updatePicture',upload.single('image'), function (req,res) {
+    if(!fs.existsSync('./public/uploads/'+req.body.userId+'/display')){
+        fs.mkdirSync('./public/uploads/'+req.body.userId+'/display');
+    }
+    fs.renameSync('./public/uploads/'+req.file.filename,'./public/uploads/'+req.body.userId+'/display/'+req.file.filename+'_'+req.file.originalname);
+    var link = '/uploads/'+req.body.userId+'/display/'+req.file.filename+'_'+req.file.originalname;
+    User
+        .findById(req.body.userId)
+        .exec(function (err,user) {
+            if(err){
+                return res.status(500).send({
+                    status:500,
+                    exception:'internal server error',
+                    message:'internal server error'
+                });
+            }else{
+                user.picture = link;
+                user.save(function (err) {
+                    if(err){
+                        return res.status(500).send({
+                            status:500,
+                            exception:'internal server error',
+                            message:'internal server error'
+                        });
+                    }else{
+                        return res.status(200).send({
+                            status:200,
+                            exception:'image saved successfully',
+                            message:'Image Saved Successfully',
+                            image:'http://localhost:3000/'+link
+                        });
+                    }
+                });
+            }
+        });
 });
 
 router.get('/unlink/:provider',function (req,res,next) {

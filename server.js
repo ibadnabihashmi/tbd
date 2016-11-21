@@ -22,6 +22,7 @@ var catalogue         = require('./api/catalogue');
 var comment           = require('./api/comment');
 var hashtag           = require('./api/hashtag');
 var image             = require('./api/image');
+var preferences       = require('./api/preferences');
 
 // Passport OAuth strategies
 require('./config/passport');
@@ -58,12 +59,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/test',function (req,res) {
   res.render('test');
 });
-app.use('/api/user'       ,user);
-app.use('/api/auth'       ,auth);
-app.use('/api/hastag'     ,hashtag);
-app.use('/api/image'      ,image);
-app.use('/api/comment'    ,comment);
-app.use('/api/catalogue'  ,catalogue);
+app.use('/api/user'         ,user);
+app.use('/api/auth'         ,auth);
+app.use('/api/hashtag'      ,hashtag);
+app.use('/api/image'        ,image);
+app.use('/api/comment'      ,comment);
+app.use('/api/catalogue'    ,catalogue);
+app.use('/api/preferences'  ,preferences);
 
 // Production error handler
 if (app.get('env') === 'production') {
