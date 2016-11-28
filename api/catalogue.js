@@ -323,7 +323,7 @@ router.get('/fetchUserCatalogues',function (req,res) {
                                 exception:null,
                                 message:'Catalogues found',
                                 catalogues:catalogues,
-                                userId:user._id
+                                user:user
                             });
                         }
                     });

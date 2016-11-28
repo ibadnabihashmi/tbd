@@ -206,4 +206,46 @@ router.get('/unlink/:provider',function (req,res,next) {
     });
 });
 
+router.post('/follow',function(req, res){
+    async.parallel([
+        function(cb){ User.findByIdAndUpdate(req.body.user1, { $addToSet: {following: req.body.user2}}).exec(cb)},
+        function(cb){ User.findByIdAndUpdate(req.body.user2, { $addToSet: {followers: req.body.user1}}).exec(cb)}
+    ], function(err){
+        if(err){
+            return res.status(500).send({
+                status:500,
+                exception:err,
+                message:'Internal server error'
+            });
+        }else{
+            return res.status(200).send({
+                status:200,
+                exception:null,
+                message:'you followed'
+            });
+        }
+    });
+});
+
+router.post('/unfollow',function(req, res){
+    async.parallel([
+        function(cb){ User.findByIdAndUpdate(req.body.user1, { $pull: {following: req.body.user2}}).exec(cb)},
+        function(cb){ User.findByIdAndUpdate(req.body.user2, { $pull: {followers: req.body.user1}}).exec(cb)}
+    ], function(err, result){
+        if(err){
+            return res.status(500).send({
+                status:500,
+                exception:err,
+                message:'Internal server error'
+            });
+        }else{
+            return res.status(200).send({
+                status:200,
+                exception:null,
+                message:'you unfollowed'
+            });
+        }
+    });
+});
+
 module.exports = router;

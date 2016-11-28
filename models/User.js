@@ -22,7 +22,17 @@ var userSchema = new mongoose.Schema({
   picture: String,
   facebook: String,
   twitter: String,
-  google: String
+  google: String,
+  followers:{
+    type : [mongoose.Schema.Types.ObjectId],
+    default:[],
+    ref : 'User'
+  },
+  following: {
+    type : [mongoose.Schema.Types.ObjectId],
+    default:[],
+    ref : 'User'
+  }
 }, schemaOptions);
 
 userSchema.pre('save', function(next) {
