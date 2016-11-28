@@ -104,13 +104,13 @@ router.get('/logout',function(req,res){
 });
 
 router.post('/update',function(req,res,next){
-    console.log(req.body);
     User.findById(req.body.id, function(err, user) {
         if ('password' in req.body) {
             user.password = req.body.password;
         } else {
             user.email = req.body.email;
             user.name = req.body.name;
+            user.username = req.body.username;
             user.gender = req.body.gender;
             user.location = req.body.location;
             user.website = req.body.website;

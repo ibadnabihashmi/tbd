@@ -299,26 +299,39 @@ router.delete('/remove',function (req,res) {
 });
 
 router.get('/fetchUserCatalogues',function (req,res) {
-    Catalogue
-        .find({
-            user:req.query.userId
-        })
-        .sort({
-            createdAt:-1
-        })
-        .exec(function (err,catalogues) {
-            if(err || !catalogues){
-                return res.status(404).send({
-                    status:404,
-                    exception:'nothiong found',
-                    message:'No catalogues found'
-                });
+    User
+        .findOne({username: req.query.username})
+        .exec(function (err,user) {
+            if(!err && user){
+                Catalogue
+                    .find({
+                        user:user._id
+                    })
+                    .sort({
+                        createdAt:-1
+                    })
+                    .exec(function (err,catalogues) {
+                        if(err || !catalogues){
+                            return res.status(404).send({
+                                status:404,
+                                exception:'nothiong found',
+                                message:'No catalogues found'
+                            });
+                        }else{
+                            return res.status(200).send({
+                                status:200,
+                                exception:null,
+                                message:'Catalogues found',
+                                catalogues:catalogues,
+                                userId:user._id
+                            });
+                        }
+                    });
             }else{
-                return res.status(200).send({
+                return res.status(404).send({
                     status:200,
-                    exception:null,
-                    message:'Catalogues found',
-                    catalogues:catalogues
+                    exception:'user not found',
+                    message:'user not found'
                 });
             }
         });
