@@ -72,6 +72,7 @@ router.post('/signup',function(req, res, next){
         }
         user = new User({
             name: req.body.name,
+            username: req.body.username,
             email: req.body.email,
             password: req.body.password
         });
@@ -133,7 +134,8 @@ router.post('/update',function(req,res,next){
 });
 
 router.post('/updatePicture',upload.single('image'), function (req,res) {
-    if(!fs.existsSync('./public/uploads/'+req.body.userId+'/display')){
+    if(!fs.existsSync('./public/uploads/'+req.body.userId)){
+        fs.mkdirSync('./public/uploads/'+req.body.userId);
         fs.mkdirSync('./public/uploads/'+req.body.userId+'/display');
     }
     fs.renameSync('./public/uploads/'+req.file.filename,'./public/uploads/'+req.body.userId+'/display/'+req.file.filename+'_'+req.file.originalname);
