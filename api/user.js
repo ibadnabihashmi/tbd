@@ -137,6 +137,8 @@ router.post('/updatePicture',upload.single('image'), function (req,res) {
     if(!fs.existsSync('./public/uploads/'+req.body.userId)){
         fs.mkdirSync('./public/uploads/'+req.body.userId);
         fs.mkdirSync('./public/uploads/'+req.body.userId+'/display');
+    }else{
+        fs.mkdirSync('./public/uploads/'+req.body.userId+'/display');
     }
     fs.renameSync('./public/uploads/'+req.file.filename,'./public/uploads/'+req.body.userId+'/display/'+req.file.filename+'_'+req.file.originalname);
     var link = '/uploads/'+req.body.userId+'/display/'+req.file.filename+'_'+req.file.originalname;
