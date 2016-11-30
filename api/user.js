@@ -4,6 +4,7 @@ var nodemailer  = require('nodemailer');
 var passport    = require('passport');
 var User        = require('../models/User');
 var Image       = require('../models/Image');
+var Catalogue   = require('../models/Catalogue');
 var express     = require('express');
 var router      = express.Router();
 var moment      = require('moment');
@@ -23,24 +24,24 @@ function generateToken(user) {
 }
 router.get('/checkAuth',function (req,res) {
     User
-        .findById(req.query.id)
-        .select('-password')
-        .exec(function (err,user) {
-            if(err || !user){
-                console.log(err);
-                res.status(500).send({
-                    status:500,
-                    message:'Internal server error'
-                });
-            }else{
-                return res.status(200).send({
-                    user:user,
-                    status:200,
-                    exception:null,
-                    message:'user found'
-                });
-            }
-        });
+      .findById(req.query.id)
+      .select('-password')
+      .exec(function (err,user) {
+          if(err || !user){
+              console.log(err);
+              res.status(500).send({
+                  status:500,
+                  message:'Internal server error'
+              });
+          }else{
+              return res.status(200).send({
+                  user:user,
+                  status:200,
+                  exception:null,
+                  message:'user found'
+              });
+          }
+      });
 });
 
 router.post('/login',function(req,res,next){
@@ -143,34 +144,34 @@ router.post('/updatePicture',upload.single('image'), function (req,res) {
     fs.renameSync('./public/uploads/'+req.file.filename,'./public/uploads/'+req.body.userId+'/display/'+req.file.filename+'_'+req.file.originalname);
     var link = '/uploads/'+req.body.userId+'/display/'+req.file.filename+'_'+req.file.originalname;
     User
-        .findById(req.body.userId)
-        .exec(function (err,user) {
-            if(err){
-                return res.status(500).send({
-                    status:500,
-                    exception:'internal server error',
-                    message:'internal server error'
-                });
-            }else{
-                user.picture = link;
-                user.save(function (err) {
-                    if(err){
-                        return res.status(500).send({
-                            status:500,
-                            exception:'internal server error',
-                            message:'internal server error'
-                        });
-                    }else{
-                        return res.status(200).send({
-                            status:200,
-                            exception:'image saved successfully',
-                            message:'Image Saved Successfully',
-                            image:'http://localhost:3000/'+link
-                        });
-                    }
-                });
-            }
-        });
+      .findById(req.body.userId)
+      .exec(function (err,user) {
+          if(err){
+              return res.status(500).send({
+                  status:500,
+                  exception:'internal server error',
+                  message:'internal server error'
+              });
+          }else{
+              user.picture = link;
+              user.save(function (err) {
+                  if(err){
+                      return res.status(500).send({
+                          status:500,
+                          exception:'internal server error',
+                          message:'internal server error'
+                      });
+                  }else{
+                      return res.status(200).send({
+                          status:200,
+                          exception:'image saved successfully',
+                          message:'Image Saved Successfully',
+                          image:'http://localhost:3000/'+link
+                      });
+                  }
+              });
+          }
+      });
 });
 
 router.get('/unlink/:provider',function (req,res,next) {
@@ -250,4 +251,51 @@ router.post('/unfollow',function(req, res){
     });
 });
 
+router.get('/fetchFeed',function (req, res) {
+    User
+      .findById(req.query.userId)
+      .exec(function (err,user) {
+          if(!err && user){
+              var query = {
+                  $and:[
+                      {
+                          modifiedAt: {
+                              $gte: new Date(req.query.to),
+                              $lt: new Date(req.query.from)
+                          }
+                      },
+                      {
+                          user: {
+                              $in:user.following
+                          }
+                      }
+                  ]
+              };
+              Catalogue
+                .find(query)
+                .exec(function (err,catalogues) {
+                    if(!err && catalogues){
+                        return res.status(200).send({
+                            status:200,
+                            exception:null,
+                            message:'Activity found',
+                            catalogues:catalogues
+                        });
+                    }else{
+                        return res.status(404).send({
+                            status:404,
+                            exception:err?err:null,
+                            message:err?'Internal Server Error':'Nothing found'
+                        });
+                    }
+                });
+          }else{
+              return res.status(404).send({
+                  status:404,
+                  exception:err?err:null,
+                  message:err?'Internal Server Error':'Nothing found'
+              });
+          }
+      });
+});
 module.exports = router;
