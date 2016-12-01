@@ -49,6 +49,7 @@ router.post('/create',upload.array('files'),function(req,res){
                                 user:user._id,
                                 hashtags:_.union(req.body['image'+counter+'tags'].split(' '))
                             });
+                            catalogue.images.push(image.source);
                             counter++;
                             image.save(function (err) {
                                 if(!err){
@@ -102,11 +103,13 @@ router.post('/create',upload.array('files'),function(req,res){
                                     message:'cannot create catalogue '+err
                                 });
                             }else{
-                                return res.status(200).send({
-                                    status:200,
-                                    exception:null,
-                                    message:'Catalogue created',
-                                    catalogueId:catalogue._id
+                                catalogue.save(function (err) {
+                                    return res.status(200).send({
+                                        status:200,
+                                        exception:null,
+                                        message:'Catalogue created',
+                                        catalogueId:catalogue._id
+                                    });
                                 });
                             }
                         });

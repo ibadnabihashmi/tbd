@@ -258,12 +258,12 @@ router.get('/fetchFeed',function (req, res) {
           if(!err && user){
               var query = {
                   $and:[
-                      {
-                          modifiedAt: {
-                              $gte: new Date(req.query.to),
-                              $lt: new Date(req.query.from)
-                          }
-                      },
+                      // {
+                      //     modifiedAt: {
+                      //         $gte: new Date(req.query.to),
+                      //         $lt: new Date(req.query.from)
+                      //     }
+                      // },
                       {
                           user: {
                               $in:user.following
