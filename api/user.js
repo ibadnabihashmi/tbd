@@ -273,6 +273,7 @@ router.get('/fetchFeed',function (req, res) {
               };
               Catalogue
                 .find(query)
+                .populate('user')
                 .exec(function (err,catalogues) {
                     if(!err && catalogues){
                         return res.status(200).send({
