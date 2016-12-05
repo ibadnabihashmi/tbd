@@ -252,18 +252,20 @@ router.post('/unfollow',function(req, res){
 });
 
 router.get('/fetchFeed',function (req, res) {
+    var from = new Date(Number(req.query.from)).toISOString();
+    var to = new Date(Number(req.query.to)).toISOString();
     User
       .findById(req.query.userId)
       .exec(function (err,user) {
           if(!err && user){
               var query = {
                   $and:[
-                      // {
-                      //     modifiedAt: {
-                      //         $gte: new Date(req.query.to),
-                      //         $lt: new Date(req.query.from)
-                      //     }
-                      // },
+                      {
+                          modifiedAt: {
+                              $lt: new Date(from),
+                              $gte: new Date(to)
+                          }
+                      },
                       {
                           user: {
                               $in:user.following
@@ -286,7 +288,8 @@ router.get('/fetchFeed',function (req, res) {
                         return res.status(404).send({
                             status:404,
                             exception:err?err:null,
-                            message:err?'Internal Server Error':'Nothing found'
+                            message:err?'Internal Server Error':'Nothing found',
+                            catalogues:[]
                         });
                     }
                 });
@@ -294,7 +297,8 @@ router.get('/fetchFeed',function (req, res) {
               return res.status(404).send({
                   status:404,
                   exception:err?err:null,
-                  message:err?'Internal Server Error':'Nothing found'
+                  message:err?'Internal Server Error':'Nothing found',
+                  catalogues:[]
               });
           }
       });
