@@ -12,9 +12,7 @@ router.post('/addtag',function (req,res) {
         })
         .exec(function (err,preferences) {
             if(!err && preferences){
-                if(preferences.tags.indexOf(req.body.tag) == -1){
-                    preferences.tags.push(req.body.tag);
-                }
+                preferences.tags = req.body.tag.split(' ');
                 preferences.save(function (err) {
                     if(!err){
                         return res.status(200).send({
@@ -37,7 +35,7 @@ router.post('/addtag',function (req,res) {
                     users:[],
                     userId:req.body.userId
                 });
-                _preferences.tags.push(req.body.tag);
+                _preferences.tags = req.body.tag.split(' ');
                 _preferences.save(function (err) {
                     if(!err){
                         return res.status(200).send({

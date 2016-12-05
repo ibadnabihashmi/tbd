@@ -7,7 +7,6 @@ var preferencesSchema = mongoose.Schema({
         ref:'User'
     },
     tags:[String],
-    users:[mongoose.Schema.Types.ObjectId]
 });
 var Preferences = mongoose.model('Preferences',preferencesSchema);
 module.exports = Preferences;
