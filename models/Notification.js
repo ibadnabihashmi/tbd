@@ -13,7 +13,10 @@ var notificationSchema = mongoose.Schema({
   },
   message: String,
   createdAt: Date,
-  read: false
+  read: {
+    type:Boolean,
+    default:false
+  }
 });
 var Notification = mongoose.model('Notification',notificationSchema);
 module.exports = Notification;

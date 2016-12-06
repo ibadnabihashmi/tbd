@@ -12,6 +12,7 @@ var multer      = require('multer');
 var upload      = multer({ dest: './public/uploads/' });
 var _           = require('lodash');
 var fs          = require('fs');
+var request     = require('request');
 
 router.post('/create',upload.array('files'),function(req,res){
     var tags = _.union(
@@ -28,6 +29,7 @@ router.post('/create',upload.array('files'),function(req,res){
         hashtags:tags,
         modifiedAt:Date.now()
     });
+    
     User
         .findById(req.body.userId)
         .exec(function (err,user) {
@@ -103,6 +105,16 @@ router.post('/create',upload.array('files'),function(req,res){
                                     message:'cannot create catalogue '+err
                                 });
                             }else{
+                                request.post({
+                                    headers: {'content-type' : 'application/json'},
+                                    url: 'http://localhost:3002/api/notification/create',
+                                    body: JSON.stringify({
+                                        tags:tags,
+                                        fromUser:req.body.userId,
+                                        catalogueTagged:catalogue,
+                                        notificationMessage:user.name + ' has created a new catalogue you might wanna check out'
+                                    })
+                                });
                                 catalogue.save(function (err) {
                                     return res.status(200).send({
                                         status:200,
