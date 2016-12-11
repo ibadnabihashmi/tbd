@@ -122,7 +122,8 @@ router.post('/update',function(req,res,next){
                 return res.status(500).send({
                     status:500,
                     exception:'Internal server error',
-                    message:'Internal server error'
+                    message:'Internal server error',
+                    user:user
                 });
             }
             return res.status(200).send({
