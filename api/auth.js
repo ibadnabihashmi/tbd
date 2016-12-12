@@ -71,7 +71,6 @@ router.post('/facebook', function (req,res) {
                         }
                         user = new User({
                             name: profile.name,
-                            username: profile.username?profile.username:profile.name.split(' ').join(''),
                             email: profile.email,
                             gender: profile.gender,
                             location: profile.location && profile.location.name,

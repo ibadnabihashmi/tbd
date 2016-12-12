@@ -70,29 +70,44 @@ router.post('/signup',function(req, res, next){
                 exception:'Bad Request',
                 message:'Not allowed , the user already exist'
             });
-        }
-        user = new User({
-            name: req.body.name,
-            username: req.body.username,
-            email: req.body.email,
-            password: req.body.password
-        });
-        user.save(function(err) {
-            if(err){
-                return res.status(500).send({
-                    status:500,
-                    exception:'Internal server error',
-                    message:'Internal server error'
+        }else{
+            User
+                .findOne({
+                    username:req.body.username
+                })
+                .exec(function (err,usr) {
+                    if(usr){
+                        return res.status(400).send({
+                            status:400,
+                            exception:'Bad Request',
+                            message:'Not allowed , username already exist'
+                        });
+                    }else{
+                        user = new User({
+                            name: req.body.name,
+                            username: req.body.username,
+                            email: req.body.email,
+                            password: req.body.password
+                        });
+                        user.save(function(err) {
+                            if(err){
+                                return res.status(500).send({
+                                    status:500,
+                                    exception:'Internal server error',
+                                    message:'Internal server error'
+                                });
+                            }
+                            return res.status(201).send({
+                                token: generateToken(user),
+                                user:user,
+                                status:201,
+                                exception:null,
+                                message:'New user created'
+                            });
+                        });
+                    }
                 });
-            }
-            return res.status(201).send({
-                token: generateToken(user),
-                user:user,
-                status:201,
-                exception:null,
-                message:'New user created'
-            });
-        });
+        }
     });
 });
 
@@ -250,6 +265,55 @@ router.post('/unfollow',function(req, res){
             });
         }
     });
+});
+
+router.post('/setUsername',function (req,res) {
+    User
+        .findOne({
+            username:req.body.username
+        })
+        .exec(function (err,usr) {
+            if(usr){
+                return res.status(400).send({
+                    status:400,
+                    exception:err,
+                    message: 'username already present',
+                    user: null
+                });
+            }else{
+                User
+                    .findById(req.body.userId)
+                    .exec(function (err,user) {
+                        if(!err && user){
+                            user.username = req.body.username;
+                            user.save(function (err) {
+                                if(!err){
+                                    return res.status(200).send({
+                                        status:200,
+                                        exception:null,
+                                        message: 'username has been set successfully',
+                                        user: user
+                                    });
+                                }else{
+                                    return res.status(500).send({
+                                        status:500,
+                                        exception:err,
+                                        message: 'username has not been set successfully',
+                                        user: user
+                                    });
+                                }
+                            });
+                        }else{
+                            return res.status(500).send({
+                                status:500,
+                                exception:err,
+                                message: 'username has not been set successfully',
+                                user: user
+                            });
+                        }
+                    });
+            }
+        });
 });
 
 router.get('/fetchFeed',function (req, res) {
