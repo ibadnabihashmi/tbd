@@ -317,56 +317,72 @@ router.post('/setUsername',function (req,res) {
 });
 
 router.get('/fetchFeed',function (req, res) {
-    var from = new Date(Number(req.query.from)).toISOString();
-    var to = new Date(Number(req.query.to)).toISOString();
-    User
-      .findById(req.query.userId)
-      .exec(function (err,user) {
-          if(!err && user){
-              var query = {
-                  $and:[
-                      {
-                          modifiedAt: {
-                              $lt: new Date(from),
-                              $gte: new Date(to)
+    // var from = new Date(Number(req.query.from)).toISOString();
+    // var to = new Date(Number(req.query.to)).toISOString();
+    var from = Number(req.query.from);
+    var to = Number(req.query.to);
+    var fetchFeed = function (fromTime,toTime) {
+        User
+          .findById(req.query.userId)
+          .exec(function (err,user) {
+              if(!err && user){
+                  var query = {
+                      $and:[
+                          {
+                              modifiedAt: {
+                                  $lte: new Date(fromTime),
+                                  $gte: new Date(toTime)
+                              }
+                          },
+                          {
+                              user: {
+                                  $in:user.following
+                              }
                           }
-                      },
-                      {
-                          user: {
-                              $in:user.following
-                          }
-                      }
-                  ]
-              };
-              Catalogue
-                .find(query)
-                .populate('user')
-                .exec(function (err,catalogues) {
-                    if(!err && catalogues){
-                        return res.status(200).send({
-                            status:200,
-                            exception:null,
-                            message:'Activity found',
-                            catalogues:catalogues
-                        });
-                    }else{
-                        return res.status(404).send({
-                            status:404,
-                            exception:err?err:null,
-                            message:err?'Internal Server Error':'Nothing found',
-                            catalogues:[]
-                        });
-                    }
-                });
-          }else{
-              return res.status(404).send({
-                  status:404,
-                  exception:err?err:null,
-                  message:err?'Internal Server Error':'Nothing found',
-                  catalogues:[]
-              });
-          }
-      });
+                      ]
+                  };
+                  Catalogue
+                    .find(query)
+                    .populate('user')
+                    .exec(function (err,catalogues) {
+                        if(!err && catalogues.length === 0){//1080000000
+
+                            if(from - toTime >= 1080000000){
+                                console.log("suck it");
+                            }else{
+                                console.log('.');
+                            }
+
+                            fetchFeed(toTime,toTime - 36000000);
+                        }else if(!err && catalogues.length > 0){
+                            return res.status(200).send({
+                                status:200,
+                                exception:null,
+                                message:'Activity found',
+                                catalogues:catalogues,
+                                from:fromTime,
+                                to:toTime
+                            });
+                        }else{
+                            return res.status(404).send({
+                                status:404,
+                                exception:err?err:null,
+                                message:err?'Internal Server Error':'Nothing found',
+                                catalogues:[]
+                            });
+                        }
+                    });
+              }else{
+                  return res.status(404).send({
+                      status:404,
+                      exception:err?err:null,
+                      message:err?'Internal Server Error':'Nothing found',
+                      catalogues:[]
+                  });
+              }
+          });
+    };
+    fetchFeed(from,to);
 });
 
 module.exports = router;
