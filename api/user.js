@@ -348,20 +348,23 @@ router.get('/fetchFeed',function (req, res) {
                         if(!err && catalogues.length === 0){//1080000000
 
                             if(from - toTime >= 1080000000){
-                                console.log("suck it");
+                                return res.status(404).send({
+                                    status:404,
+                                    exception:err?err:null,
+                                    message:err?'Internal Server Error':'Nothing found',
+                                    catalogues:[]
+                                });
                             }else{
-                                console.log('.');
+                                fetchFeed(toTime,toTime - 36000000);
                             }
-
-                            fetchFeed(toTime,toTime - 36000000);
                         }else if(!err && catalogues.length > 0){
                             return res.status(200).send({
                                 status:200,
                                 exception:null,
                                 message:'Activity found',
                                 catalogues:catalogues,
-                                from:fromTime,
-                                to:toTime
+                                from:toTime,
+                                to:toTime - 36000000
                             });
                         }else{
                             return res.status(404).send({
